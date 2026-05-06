@@ -86,7 +86,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // Validasi gender
     if (_selectedGender.isEmpty) {
-      genderErr = 'Pilih jenis kelamin';
+      genderErr = 'Pilih jenis kelamin';  
     }
 
     if (_selectedDateOfBirth == null) {
