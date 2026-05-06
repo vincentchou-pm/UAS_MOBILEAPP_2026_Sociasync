@@ -11,7 +11,24 @@ import 'package:sociasync_app/services/auth_service.dart';
 import 'package:sociasync_app/services/local_notification_service.dart';
 
 class NotificationPage extends StatefulWidget {
-  const NotificationPage({super.key});
+  final Future<Map<String, dynamic>> Function()? getMe;
+  final Future<List<Map<String, dynamic>>> Function()? getNotifications;
+  final Future<void> Function()? markAllRead;
+
+  final Future<void> Function({
+    required String title,
+    required String body,
+    String? payload,
+  })?
+  showNotification;
+
+  const NotificationPage({
+    super.key,
+    this.getMe,
+    this.getNotifications,
+    this.markAllRead,
+    this.showNotification, // 🔥 jangan lupa
+  });
 
   @override
   State<NotificationPage> createState() => _NotificationPageState();
@@ -32,8 +49,15 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Future<void> _loadData() async {
     try {
-      final profile = await AuthService.getMe();
-      final notifications = await AuthService.getNotifications();
+      final profile = await (widget.getMe?.call() ?? AuthService.getMe());
+
+      final notifications =
+          await (widget.getNotifications?.call() ??
+              AuthService.getNotifications());
+
+      await (widget.markAllRead?.call() ??
+          AuthService.markAllNotificationsRead());
+
       if (!mounted) return;
 
       final unreadNotifications = notifications.where((item) {
@@ -43,14 +67,21 @@ class _NotificationPageState extends State<NotificationPage> {
       for (final item in unreadNotifications) {
         final title = (item['title'] ?? 'Notification').toString().trim();
         final message = (item['message'] ?? '').toString().trim();
-        await LocalNotificationService.showBackendNotification(
-          title: title.isEmpty ? 'Notification' : title,
-          body: message.isEmpty ? '-' : message,
-          payload: 'notification:${item['id'] ?? ''}',
-        );
+
+        await (widget.showNotification?.call(
+              title: title.isEmpty ? 'Notification' : title,
+              body: message.isEmpty ? '-' : message,
+              payload: 'notification:${item['id'] ?? ''}',
+            ) ??
+            LocalNotificationService.showBackendNotification(
+              title: title.isEmpty ? 'Notification' : title,
+              body: message.isEmpty ? '-' : message,
+              payload: 'notification:${item['id'] ?? ''}',
+            ));
       }
 
-      await AuthService.markAllNotificationsRead();
+      await (widget.markAllRead?.call() ??
+          AuthService.markAllNotificationsRead());
 
       final name = (profile['name'] ?? '').toString().trim();
       final mapped = notifications.map(_mapNotification).toList();
