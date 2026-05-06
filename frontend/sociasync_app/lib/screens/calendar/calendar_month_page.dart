@@ -11,14 +11,55 @@ import 'package:sociasync_app/screens/profile/profile_page.dart';
 class CalendarMonthPage extends StatefulWidget {
   const CalendarMonthPage({super.key});
 
+  static const yearTextKey = ValueKey('calendar-month-year-text');
+  static const viewDropdownKey = ValueKey('calendar-month-view-dropdown');
+  static const monthGridKey = ValueKey('calendar-month-grid');
+
+  static ValueKey<String> miniMonthCardKey(int month) =>
+      ValueKey('calendar-month-card-$month');
+
+  static ValueKey<String> miniMonthDayGridKey(int month) =>
+      ValueKey('calendar-month-day-grid-$month');
+
   @override
   State<CalendarMonthPage> createState() => _CalendarMonthPageState();
 }
 
+class CalendarMonthConfig {
+  static const int currentYear = 2026;
+  static const int currentMonth = 3;
+
+  static const List<String> monthNames = [
+    '',
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER',
+  ];
+
+  static int daysInMonth(int month, [int year = currentYear]) {
+    RangeError.checkValueInInterval(month, 1, 12, 'month');
+    return DateTime(year, month + 1, 0).day;
+  }
+
+  static int startOffset(int month, [int year = currentYear]) {
+    RangeError.checkValueInInterval(month, 1, 12, 'month');
+    return DateTime(year, month, 1).weekday % 7;
+  }
+}
+
 class _CalendarMonthPageState extends State<CalendarMonthPage> {
   final Color primaryBlue = const Color(0xFF1D5093);
-  final int currentYear = 2026;
-  final int currentMonth = 3; // March highlighted
+  final int currentYear = CalendarMonthConfig.currentYear;
+  final int currentMonth = CalendarMonthConfig.currentMonth;
 
   void _showViewDropdown(BuildContext context) {
     showMenu(
@@ -97,6 +138,7 @@ class _CalendarMonthPageState extends State<CalendarMonthPage> {
                       children: [
                         Text(
                           '$currentYear',
+                          key: CalendarMonthPage.yearTextKey,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -105,6 +147,7 @@ class _CalendarMonthPageState extends State<CalendarMonthPage> {
                         ),
                         Builder(
                           builder: (ctx) => GestureDetector(
+                            key: CalendarMonthPage.viewDropdownKey,
                             onTap: () => _showViewDropdown(ctx),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
@@ -168,6 +211,7 @@ class _CalendarMonthPageState extends State<CalendarMonthPage> {
                                 : 0.82;
 
                             return GridView.builder(
+                              key: CalendarMonthPage.monthGridKey,
                               shrinkWrap: true,
                               padding: EdgeInsets.zero,
                               physics: const NeverScrollableScrollPhysics(),
@@ -221,26 +265,10 @@ class _CalendarMonthPageState extends State<CalendarMonthPage> {
   }
 
   Widget _buildMiniMonth(int month, int year) {
-    const monthNames = [
-      '',
-      'JANUARY',
-      'FEBRUARY',
-      'MARCH',
-      'APRIL',
-      'MAY',
-      'JUNE',
-      'JULY',
-      'AUGUST',
-      'SEPTEMBER',
-      'OCTOBER',
-      'NOVEMBER',
-      'DECEMBER',
-    ];
     final isCurrentMonth = month == currentMonth;
 
-    final firstDay = DateTime(year, month, 1);
-    final daysInMonth = DateTime(year, month + 1, 0).day;
-    int startOffset = firstDay.weekday % 7;
+    final daysInMonth = CalendarMonthConfig.daysInMonth(month, year);
+    final startOffset = CalendarMonthConfig.startOffset(month, year);
 
     final bgColor = isCurrentMonth
         ? primaryBlue
@@ -250,6 +278,8 @@ class _CalendarMonthPageState extends State<CalendarMonthPage> {
     final dayNumColor = isCurrentMonth ? Colors.white70 : Colors.black54;
 
     return GestureDetector(
+      key: CalendarMonthPage.miniMonthCardKey(month),
+      behavior: HitTestBehavior.opaque,
       onTap: () => _onMonthTapped(month),
       child: Container(
         decoration: BoxDecoration(
@@ -288,7 +318,7 @@ class _CalendarMonthPageState extends State<CalendarMonthPage> {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      monthNames[month],
+                      CalendarMonthConfig.monthNames[month],
                       style: TextStyle(
                         fontSize: monthFontSize,
                         fontWeight: FontWeight.bold,
@@ -322,6 +352,7 @@ class _CalendarMonthPageState extends State<CalendarMonthPage> {
                   ),
                   Expanded(
                     child: GridView.builder(
+                      key: CalendarMonthPage.miniMonthDayGridKey(month),
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),

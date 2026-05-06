@@ -10,7 +10,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: SavedContentPage(savedContentLoader: () async => []),
+            home: const SavedContentPage(),
           ),
         );
 
@@ -26,7 +26,7 @@ void main() {
 
     testWidgets('tap sort chips tidak menyebabkan error', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(home: SavedContentPage(savedContentLoader: () async => [])),
+        MaterialApp(home: const SavedContentPage()),
       );
 
       await tester.pumpAndSettle();
@@ -42,9 +42,7 @@ void main() {
     });
 
     testWidgets('tap Filter Date membuka dialog dan Apply', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(home: SavedContentPage(savedContentLoader: () async => [])),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -63,9 +61,7 @@ void main() {
     testWidgets('menampilkan pesan no strategy saat data kosong', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(home: SavedContentPage(savedContentLoader: () async => [])),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -76,31 +72,7 @@ void main() {
     testWidgets('menampilkan saved content card dan navigasi detail', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: SavedContentPage(
-            savedContentLoader: () async => [
-              {
-                'id': 1,
-                'topic': 'Test Topic',
-                'idea': {
-                  'title': 'Test Idea Title',
-                  'description': 'Test Idea Description',
-                },
-                'script': {
-                  'hook': 'Test Hook',
-                  'body': 'Test Body',
-                  'cta': 'Test CTA',
-                },
-                'caption': 'Test Caption',
-                'hashtags': ['#test'],
-                'created_at': DateTime.now().toIso8601String(),
-                'platform': 'Instagram',
-              },
-            ],
-          ),
-        ),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -125,9 +97,7 @@ void main() {
     testWidgets('menampilkan AppNavbar di halaman Saved Content', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(home: SavedContentPage(savedContentLoader: () async => [])),
-      );
+      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 

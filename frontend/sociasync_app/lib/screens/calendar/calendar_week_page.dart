@@ -10,12 +10,128 @@ import 'package:sociasync_app/screens/chatbot_AI/chatbot.dart';
 import 'package:sociasync_app/screens/profile/profile_page.dart';
 import 'package:sociasync_app/services/schedule_service.dart';
 
+typedef CalendarScheduleLoader = Future<List<Map<String, dynamic>>> Function();
+
 class CalendarWeekPage extends StatefulWidget {
+  const CalendarWeekPage({super.key, this.initialDate, this.scheduleLoader});
+
   final DateTime? initialDate;
-  const CalendarWeekPage({super.key, this.initialDate});
+  final CalendarScheduleLoader? scheduleLoader;
+
+  static const viewDropdownKey = ValueKey('calendar-week-view-dropdown');
+  static const weekDaysHeaderKey = ValueKey('calendar-week-days-header');
+  static const addEventButtonKey = ValueKey('calendar-week-add-event-button');
+  static const eventDetailsDialogKey = ValueKey(
+    'calendar-week-event-details-dialog',
+  );
+
+  static ValueKey<String> dayColumnKey(DateTime day) =>
+      ValueKey('calendar-week-day-column-${CalendarWeekConfig.eventKey(day)}');
+
+  static ValueKey<String> weekDayItemKey(DateTime day) =>
+      ValueKey('calendar-week-day-item-${CalendarWeekConfig.eventKey(day)}');
+
+  static ValueKey<String> deadlineRowKey(String title) =>
+      ValueKey('calendar-week-deadline-row-$title');
 
   @override
   State<CalendarWeekPage> createState() => _CalendarWeekPageState();
+}
+
+class CalendarWeekConfig {
+  static const List<String> monthLabels = [
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  static const List<String> weekDayLabels = [
+    '',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
+  ];
+
+  static const List<String> shortWeekDayLabels = [
+    '',
+    'Mo',
+    'Tu',
+    'We',
+    'Th',
+    'Fr',
+    'Sa',
+    'Su',
+  ];
+
+  static List<DateTime> weekDays(DateTime date) {
+    final monday = date.subtract(Duration(days: date.weekday - 1));
+    return List.generate(9, (i) => monday.add(Duration(days: i)));
+  }
+
+  static String eventKey(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  static String monthLabel(DateTime d) {
+    return '${monthLabels[d.month]} ${d.year}';
+  }
+
+  static String fullDate(DateTime d) {
+    return '${weekDayLabels[d.weekday]}, ${d.day} ${monthLabels[d.month]} ${d.year}';
+  }
+
+  static String prettyDateTime(String raw) {
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) return '-';
+
+    final hour12 = parsed.hour % 12 == 0 ? 12 : parsed.hour % 12;
+    final minute = parsed.minute.toString().padLeft(2, '0');
+    final period = parsed.hour < 12 ? 'AM' : 'PM';
+    return '${fullDate(parsed)} • $hour12:$minute $period';
+  }
+
+  static String valueOrDash(dynamic value) {
+    final text = (value ?? '').toString().trim();
+    return text.isEmpty || text.toLowerCase() == 'null' ? '-' : text;
+  }
+
+  static String repeatFromApi(String value) {
+    final raw = value.trim().toLowerCase();
+    if (raw == 'daily') return 'Daily';
+    if (raw == 'weekly') return 'Weekly';
+    if (raw == 'monthly') return 'Monthly';
+    return 'Never';
+  }
+
+  static Map<String, List<Map<String, dynamic>>> groupSchedulesByDay(
+    List<Map<String, dynamic>> schedules,
+  ) {
+    final grouped = <String, List<Map<String, dynamic>>>{};
+
+    for (final item in schedules) {
+      final rawStart = (item['start_time'] ?? '').toString();
+      final parsedStart = DateTime.tryParse(rawStart);
+      if (parsedStart == null) continue;
+
+      final key = eventKey(parsedStart);
+      grouped.putIfAbsent(key, () => <Map<String, dynamic>>[]).add(item);
+    }
+
+    return grouped;
+  }
 }
 
 class _CalendarWeekPageState extends State<CalendarWeekPage> {
@@ -34,17 +150,9 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
 
   Future<void> _loadSchedules() async {
     try {
-      final schedules = await ScheduleService.getSchedules();
-      final grouped = <String, List<Map<String, dynamic>>>{};
-
-      for (final item in schedules) {
-        final rawStart = (item['start_time'] ?? '').toString();
-        final parsedStart = DateTime.tryParse(rawStart);
-        if (parsedStart == null) continue;
-
-        final key = _eventKey(parsedStart);
-        grouped.putIfAbsent(key, () => <Map<String, dynamic>>[]).add(item);
-      }
+      final loader = widget.scheduleLoader ?? ScheduleService.getSchedules;
+      final schedules = await loader();
+      final grouped = CalendarWeekConfig.groupSchedulesByDay(schedules);
 
       if (!mounted) return;
       setState(() {
@@ -62,51 +170,14 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
 
   // --- Logic Helpers ---
   List<DateTime> _getWeekDays(DateTime date) {
-    final monday = date.subtract(Duration(days: date.weekday - 1));
-    return List.generate(9, (i) => monday.add(Duration(days: i)));
+    return CalendarWeekConfig.weekDays(date);
   }
 
-  String _eventKey(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  String _eventKey(DateTime d) => CalendarWeekConfig.eventKey(d);
 
-  String _monthLabel(DateTime d) {
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[d.month]} ${d.year}';
-  }
+  String _monthLabel(DateTime d) => CalendarWeekConfig.monthLabel(d);
 
-  String _fullDate(DateTime d) {
-    const days = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${days[d.weekday]}, ${d.day} ${months[d.month]} ${d.year}';
-  }
+  String _fullDate(DateTime d) => CalendarWeekConfig.fullDate(d);
 
   List<Map<String, dynamic>> _eventsForDay(DateTime day) {
     return _events[_eventKey(day)] ?? const <Map<String, dynamic>>[];
@@ -119,7 +190,7 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
     final hour12 = parsed.hour % 12 == 0 ? 12 : parsed.hour % 12;
     final minute = parsed.minute.toString().padLeft(2, '0');
     final period = parsed.hour < 12 ? 'AM' : 'PM';
-    return '${_fullDate(parsed)} • $hour12.$minute $period';
+    return '${_fullDate(parsed)} • $hour12:$minute $period';
   }
 
   String _valueOrDash(dynamic value) {
@@ -202,6 +273,7 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        key: CalendarWeekPage.eventDetailsDialogKey,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
@@ -413,6 +485,7 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
               // 4. Button Add Event
               Center(
                 child: ElevatedButton(
+                  key: CalendarWeekPage.addEventButtonKey,
                   onPressed: () async {
                     final saved = await Navigator.push<Map<String, dynamic>>(
                       context,
@@ -488,6 +561,7 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
     const days = ['', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su', 'Mo', 'Tu'];
 
     return GestureDetector(
+      key: CalendarWeekPage.weekDayItemKey(d),
       onTap: () => setState(() => _focusedDate = d),
       child: Container(
         width: 42,
@@ -539,6 +613,7 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
     final events = _eventsForDay(day);
 
     return Padding(
+      key: CalendarWeekPage.dayColumnKey(day),
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,18 +630,25 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
           ),
           const SizedBox(height: 20),
 
-          // Deadline/Event list dari API schedules
-          if (events.isEmpty) ...[
-            _buildDeadlineRow('Belum ada event'),
-          ] else ...[
-            ...events.take(4).map((e) {
-              final title = (e['title'] ?? 'Untitled event').toString();
-              return _buildDeadlineRow(
-                title,
-                onTap: () => _showEventDetails(e),
-              );
-            }),
-          ],
+          Flexible(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  if (events.isEmpty) ...[
+                    _buildDeadlineRow('Belum ada event'),
+                  ] else ...[
+                    ...events.take(4).map((e) {
+                      final title = (e['title'] ?? 'Untitled event').toString();
+                      return _buildDeadlineRow(
+                        title,
+                        onTap: () => _showEventDetails(e),
+                      );
+                    }),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -574,6 +656,7 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
 
   Widget _buildDeadlineRow(String title, {VoidCallback? onTap}) {
     return Padding(
+      key: CalendarWeekPage.deadlineRowKey(title),
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onTap: onTap,
@@ -614,6 +697,7 @@ class _CalendarWeekPageState extends State<CalendarWeekPage> {
 
   Widget _buildViewDropdownBtn() {
     return Container(
+      key: CalendarWeekPage.viewDropdownKey,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFF2B65AD),
