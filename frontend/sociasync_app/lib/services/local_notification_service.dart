@@ -127,7 +127,7 @@ class LocalNotificationService {
           'Target: ${_formatTime(remindAt)}\n'
           'Sekarang: ${_formatTime(now)}\n'
           'Izin Exact: ${canExact ? "OK" : "MATI"}\n'
-          '${debugStatus}';
+          '$debugStatus';
     } catch (e) {
       return 'GAGAL: $e';
     }

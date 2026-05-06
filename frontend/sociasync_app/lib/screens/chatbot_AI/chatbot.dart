@@ -73,8 +73,8 @@ class _ChatbotPageState extends State<ChatbotPage> {
   bool _isReminderActionLoading = false;
 
   // For reminder date/time picker
-  DateTime _reminderDate = DateTime.now();
-  TimeOfDay _reminderTime = const TimeOfDay(hour: 10, minute: 0);
+  final DateTime _reminderDate = DateTime.now();
+  final TimeOfDay _reminderTime = const TimeOfDay(hour: 10, minute: 0);
 
   List<_ChatMessage> _chatMessages = const <_ChatMessage>[
     _ChatMessage(
