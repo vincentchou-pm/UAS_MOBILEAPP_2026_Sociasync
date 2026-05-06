@@ -15,10 +15,10 @@ class AddCalendarPage extends StatefulWidget {
   const AddCalendarPage({super.key, this.initialData});
 
   @override
-  State<AddCalendarPage> createState() => _AddCalendarPageState();
+  State<AddCalendarPage> createState() => AddCalendarPageState();
 }
 
-class _AddCalendarPageState extends State<AddCalendarPage> {
+class AddCalendarPageState extends State<AddCalendarPage> {
   final Color primaryBlue = const Color(0xFF1D5093);
 
   late final TextEditingController _titleCtrl;
@@ -184,6 +184,75 @@ class _AddCalendarPageState extends State<AddCalendarPage> {
     if (normalized.contains('tik')) return 'tiktok';
     return 'instagram';
   }
+
+  @visibleForTesting
+  String formatDateForTest(DateTime d) => _formatDate(d);
+
+  @visibleForTesting
+  String formatTimeForTest(TimeOfDay t) => _formatTime(t);
+
+  @visibleForTesting
+  String repeatToApiForTest(String value) => _repeatToApi(value);
+
+  @visibleForTesting
+  String normalizePlatformForTest(String value) => _normalizePlatform(value);
+
+  @visibleForTesting
+  bool isValidTitleForTest(String title) => title.trim().isNotEmpty;
+
+  @visibleForTesting
+  bool isValidTimeRangeForTest(DateTime start, DateTime end) {
+    return !end.isBefore(start);
+  }
+
+  @visibleForTesting
+  bool isEditModeForTest() => _isEditMode;
+
+  @visibleForTesting
+  void setScheduleIdForTest(int? id) {
+    _scheduleId = id;
+  }
+
+  void _ensureControllersForTest() {
+    try {
+      _titleCtrl.text;
+    } catch (_) {
+      _titleCtrl = TextEditingController();
+    }
+
+    try {
+      _notesCtrl.text;
+    } catch (_) {
+      _notesCtrl = TextEditingController();
+    }
+  }
+
+  @visibleForTesting
+  void initializeFromDataForTest(Map<String, dynamic>? data) {
+    _ensureControllersForTest();
+    if (data == null) {
+      _titleCtrl.text = '';
+      _notesCtrl.text = '';
+      _platform = 'instagram';
+      _scheduleId = null;
+      return;
+    }
+    _titleCtrl.text = data['title'] ?? '';
+    _notesCtrl.text = data['notes'] ?? '';
+    _platform = _normalizePlatform(
+      (data['platform'] ?? 'instagram').toString(),
+    );
+    _scheduleId = int.tryParse((data['scheduleId'] ?? '').toString());
+  }
+
+  @visibleForTesting
+  String getTitleForTest() {
+    _ensureControllersForTest();
+    return _titleCtrl.text;
+  }
+
+  @visibleForTesting
+  String getPlatformForTest() => _platform;
 
   Future<void> _submitEvent() async {
     if (_isSubmitting) return;
