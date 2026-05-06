@@ -335,12 +335,14 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           const Icon(Icons.error_outline, color: Color(0xFFFF4D4D), size: 13),
           const SizedBox(width: 4),
-          Text(
-            message,
-            style: const TextStyle(
-              color: Color(0xFFFF4D4D),
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFFFF4D4D),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
