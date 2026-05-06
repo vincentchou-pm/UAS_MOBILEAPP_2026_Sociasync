@@ -106,16 +106,22 @@ class _CalendarYearPageState extends State<CalendarYearPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Yearly Calendar',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                        const Expanded(
+                          child: Text(
+                            'Yearly Calendar',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 12),
                         Builder(
                           builder: (ctx) => GestureDetector(
+                            key: const Key('calendarYearViewDropdown'),
                             onTap: () => _showViewDropdown(ctx),
                             child: Container(
                               padding: const EdgeInsets.symmetric(

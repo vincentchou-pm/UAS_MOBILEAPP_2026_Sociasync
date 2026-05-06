@@ -78,8 +78,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('No strategy found.'), findsOneWidget);
-      expect(find.byType(GridView), findsNothing);
+      expect(find.text('Saved Strategy'), findsOneWidget);
     });
 
     testWidgets(

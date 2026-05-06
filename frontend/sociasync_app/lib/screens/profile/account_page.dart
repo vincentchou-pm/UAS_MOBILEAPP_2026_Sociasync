@@ -7,7 +7,7 @@ import 'package:sociasync_app/screens/dashboard/dashboard_page.dart';
 import 'package:sociasync_app/screens/chatbot_AI/chatbot.dart';
 import 'package:sociasync_app/screens/auth/login_page.dart';
 import 'package:sociasync_app/services/auth_service.dart';
-import 'package:sociasync_app/config/api_config.dart';
+import 'package:sociasync_app/utils/account_utils.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -43,52 +43,12 @@ class _AccountPageState extends State<AccountPage> {
   String? _profileImageUrl;
 
   String _formatApiDateToDisplay(String value) {
-    final parsed = DateTime.tryParse(value);
-    if (parsed == null) {
-      return dateOfBirth;
-    }
-    const monthNames = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${parsed.day} ${monthNames[parsed.month]} ${parsed.year}';
+    final result = DateFormatter.formatApiDateToDisplay(value);
+    return result.isEmpty ? dateOfBirth : result;
   }
 
   String _formatDisplayDateToApi(String value) {
-    try {
-      final parts = value.split(' ');
-      final months = {
-        'Jan': 1,
-        'Feb': 2,
-        'Mar': 3,
-        'Apr': 4,
-        'May': 5,
-        'Jun': 6,
-        'Jul': 7,
-        'Aug': 8,
-        'Sep': 9,
-        'Oct': 10,
-        'Nov': 11,
-        'Dec': 12,
-      };
-      final yyyy = int.parse(parts[2]);
-      final mm = (months[parts[1]] ?? 1).toString().padLeft(2, '0');
-      final dd = int.parse(parts[0]).toString().padLeft(2, '0');
-      return '$yyyy-$mm-$dd';
-    } catch (_) {
-      return '';
-    }
+    return DateFormatter.formatDisplayDateToApi(value);
   }
 
   Future<void> _saveProfile(Map<String, dynamic> payload) async {
@@ -189,11 +149,7 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   String? _resolveProfileImageUrl(String raw) {
-    if (raw.trim().isEmpty) return null;
-    if (raw.startsWith('http://') || raw.startsWith('https://')) {
-      return raw;
-    }
-    return '${ApiConfig.baseUrl}${raw.startsWith('/') ? raw : '/$raw'}';
+    return ImageUrlResolver.resolveProfileImageUrl(raw);
   }
 
   Future<void> _pickAndUploadProfileImage(ImageSource source) async {
