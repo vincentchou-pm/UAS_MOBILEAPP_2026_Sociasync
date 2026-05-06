@@ -9,9 +9,7 @@ void main() {
       'menampilkan header, search field, filter date dan sort chips',
       (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: const SavedContentPage(),
-          ),
+          MaterialApp(home: SavedContentPage()),
         );
 
         await tester.pumpAndSettle();
@@ -26,7 +24,7 @@ void main() {
 
     testWidgets('tap sort chips tidak menyebabkan error', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(home: const SavedContentPage()),
+        MaterialApp(home: SavedContentPage()),
       );
 
       await tester.pumpAndSettle();
@@ -42,7 +40,9 @@ void main() {
     });
 
     testWidgets('tap Filter Date membuka dialog dan Apply', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(
+        MaterialApp(home: SavedContentPage()),
+      );
 
       await tester.pumpAndSettle();
 
@@ -61,7 +61,9 @@ void main() {
     testWidgets('menampilkan pesan no strategy saat data kosong', (
       tester,
     ) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(
+        MaterialApp(home: SavedContentPage()),
+      );
 
       await tester.pumpAndSettle();
 
@@ -72,7 +74,11 @@ void main() {
     testWidgets('menampilkan saved content card dan navigasi detail', (
       tester,
     ) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SavedContentPage(),
+        ),
+      );
 
       await tester.pumpAndSettle();
 
@@ -97,7 +103,9 @@ void main() {
     testWidgets('menampilkan AppNavbar di halaman Saved Content', (
       tester,
     ) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(
+        MaterialApp(home: SavedContentPage()),
+      );
 
       await tester.pumpAndSettle();
 

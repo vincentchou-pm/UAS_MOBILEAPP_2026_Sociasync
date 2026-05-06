@@ -314,6 +314,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+<<<<<<< Updated upstream
   glob:
     dependency: transitive
     description:
@@ -330,6 +331,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+=======
+>>>>>>> Stashed changes
   http:
     dependency: "direct main"
     description:
@@ -423,6 +426,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+<<<<<<< Updated upstream
   io:
     dependency: transitive
     description:
@@ -439,6 +443,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.11.0"
+=======
+>>>>>>> Stashed changes
   leak_tracker:
     dependency: transitive
     description:
@@ -583,6 +589,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+<<<<<<< Updated upstream
   pool:
     dependency: transitive
     description:
@@ -591,6 +598,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.2"
+=======
+>>>>>>> Stashed changes
   process:
     dependency: transitive
     description:
@@ -599,6 +608,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.5"
+<<<<<<< Updated upstream
   pub_semver:
     dependency: transitive
     description:
@@ -615,6 +625,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+=======
+>>>>>>> Stashed changes
   shared_preferences:
     dependency: "direct main"
     description:
@@ -812,6 +824,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+<<<<<<< Updated upstream
   web_socket:
     dependency: transitive
     description:
@@ -828,6 +841,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+=======
+>>>>>>> Stashed changes
   webdriver:
     dependency: transitive
     description:

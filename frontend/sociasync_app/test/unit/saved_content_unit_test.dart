@@ -8,7 +8,7 @@ void main() {
     testWidgets('menampilkan header Saved Strategy dan search field', (
       tester,
     ) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -20,7 +20,7 @@ void main() {
     testWidgets('menampilkan sort chips Platform dan Latest (Date)', (
       tester,
     ) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -31,7 +31,7 @@ void main() {
     testWidgets('menampilkan bottom navbar di Saved Content page', (
       tester,
     ) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -41,7 +41,7 @@ void main() {
 
   group('SavedContentPage - Search and filter interactions', () {
     testWidgets('search input menerima teks', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -55,7 +55,7 @@ void main() {
     });
 
     testWidgets('tap Filter Date membuka dialog dan Apply', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      await tester.pumpWidget(MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -74,7 +74,9 @@ void main() {
 
   group('SavedContentPage - Content card and detail navigation', () {
     testWidgets('menampilkan pesan kosong saat tidak ada data', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+      // savedContentLoader parameter does not exist on SavedContentPage;
+      // just render the page and verify basic UI renders without crashing.
+      await tester.pumpWidget(MaterialApp(home: SavedContentPage()));
 
       await tester.pumpAndSettle();
 
@@ -84,7 +86,7 @@ void main() {
     testWidgets(
       'tap content card membuka Saved Content Detail ketika data ada',
       (tester) async {
-        await tester.pumpWidget(const MaterialApp(home: SavedContentPage()));
+        await tester.pumpWidget(MaterialApp(home: SavedContentPage()));
 
         await tester.pumpAndSettle();
 
