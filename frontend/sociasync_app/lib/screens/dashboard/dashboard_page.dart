@@ -22,7 +22,9 @@ import 'package:sociasync_app/widgets/tiktok_manage_account_dialog.dart';
 enum SocialPlatform { instagram, tiktok }
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final bool isTest;
+
+  const DashboardPage({super.key, this.isTest = false});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -63,7 +65,38 @@ class _DashboardPageState extends State<DashboardPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _bootstrap();
+
+    if (widget.isTest) {
+      _isLoading = false;
+
+      // mock state biar widget test bisa render semua komponen
+      _instagramConnected = true;
+      _instagramUsername = 'mockuser';
+
+      _latestInstagramStats = {
+        'engagement_percentage': 12.5,
+        'followers_count': 1500,
+        'total_posts': 42,
+        'estimated_reach': 5000,
+        'total_likes': 800,
+        'total_comments': 120,
+      };
+
+      _instagramStatsHistory = [
+        {'engagement_percentage': 10.0, 'recorded_at': '2026-04-20'},
+        {'engagement_percentage': 15.0, 'recorded_at': '2026-04-21'},
+        {'engagement_percentage': 18.0, 'recorded_at': '2026-04-22'},
+        {'engagement_percentage': 12.0, 'recorded_at': '2026-04-23'},
+        {'engagement_percentage': 20.0, 'recorded_at': '2026-04-24'},
+      ];
+
+      _bestInstagramPosts = [
+        {'likes': 120, 'comments_count': 15, 'image_url': ''},
+        {'likes': 95, 'comments_count': 10, 'image_url': ''},
+      ];
+    } else {
+      _bootstrap();
+    }
   }
 
   @override
@@ -1314,20 +1347,27 @@ class _DashboardPageState extends State<DashboardPage>
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  leftMetric,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                Expanded(
+                  child: Text(
+                    leftMetric,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-                Text(
-                  rightMetric,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    rightMetric,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
