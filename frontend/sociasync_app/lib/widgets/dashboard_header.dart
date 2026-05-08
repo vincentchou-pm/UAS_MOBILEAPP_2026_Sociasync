@@ -96,6 +96,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
           clipBehavior: Clip.none,
           children: [
             IconButton(
+              key: const Key('notification_button'),
               onPressed:
                   widget.onNotificationTap ??
                   () {

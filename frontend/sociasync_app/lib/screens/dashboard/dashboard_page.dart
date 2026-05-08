@@ -824,7 +824,7 @@ class _DashboardPageState extends State<DashboardPage>
     };
 
     // Small safety headroom avoids sub-pixel overflow on some devices.
-    return baseHeight + extraForText + 2;
+    return baseHeight + extraForText + 21;
   }
 
   Widget _buildStatsCard({

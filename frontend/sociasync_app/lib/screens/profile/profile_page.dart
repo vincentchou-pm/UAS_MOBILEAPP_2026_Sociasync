@@ -267,6 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             Icons.logout,
                             textColor: Colors.red.shade400,
                             onTap: () => _showLogOutDialog(context),
+                            key: const Key('logout_tile'),
                           ),
                         ]),
                       ],
@@ -453,10 +454,12 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildSettingsTile(
     String title,
     IconData icon, {
+    Key? key,
     Color? textColor,
     required VoidCallback onTap,
   }) {
     return ListTile(
+      key: key,
       leading: Icon(icon, color: textColor ?? primaryBlue, size: 22),
       title: Text(
         title,

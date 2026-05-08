@@ -6,7 +6,9 @@ import 'package:flutter/foundation.dart';
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
+
   static bool _initialized = false;
+  static bool isTestMode = false;
 
   // Gunakan ID channel v5 (Reset total settingan di HP)
   static const AndroidNotificationDetails _androidDetails =
@@ -41,9 +43,11 @@ class LocalNotificationService {
           AndroidFlutterLocalNotificationsPlugin
         >();
 
-    await androidImpl?.requestNotificationsPermission();
-    await androidImpl?.requestExactAlarmsPermission();
-
+    if (!isTestMode) {
+      await androidImpl?.requestNotificationsPermission();
+      await androidImpl?.requestExactAlarmsPermission();
+    }
+    
     _initialized = true;
   }
 

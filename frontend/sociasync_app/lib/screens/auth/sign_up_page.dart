@@ -375,6 +375,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         _buildLabel('Date of Birth'),
                         const SizedBox(height: 6),
                         _buildPickerField(
+                          key: const Key('dob_picker'),
                           text: _dateLabel(),
                           onTap: _showDateOfBirthPicker,
                           hasError: _dateOfBirthError != null,
@@ -640,6 +641,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _buildPickerField({
+    Key? key,
     required String text,
     required VoidCallback onTap,
     bool hasError = false,
@@ -647,6 +649,7 @@ class _SignUpPageState extends State<SignUpPage> {
     final isPlaceholder =
         text == 'Select date of birth' || text == 'Select region';
     return GestureDetector(
+      key: key,
       onTap: onTap,
       child: Container(
         height: 44,

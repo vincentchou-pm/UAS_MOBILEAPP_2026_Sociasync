@@ -53,7 +53,9 @@ class _ReminderItem {
 }
 
 class ChatbotPage extends StatefulWidget {
-  const ChatbotPage({super.key});
+  final Future<List<Map<String, dynamic>>> Function()? getRemindersOverride;
+
+  const ChatbotPage({super.key, this.getRemindersOverride});
 
   @override
   State<ChatbotPage> createState() => _ChatbotPageState();
@@ -125,18 +127,25 @@ class _ChatbotPageState extends State<ChatbotPage> {
     if (_isLoadingReminders) return;
 
     setState(() => _isLoadingReminders = true);
+
     try {
-      final response = await ReminderService.getReminders();
+      final response = widget.getRemindersOverride != null
+          ? await widget.getRemindersOverride!()
+          : await ReminderService.getReminders();
+
       final reminders = response.map(_ReminderItem.fromJson).toList();
+
       if (!mounted) return;
+
       setState(() {
         _reminders = reminders;
       });
-    } on AuthException catch (e) {
+    } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(e.message)));
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) {
         setState(() => _isLoadingReminders = false);
@@ -502,7 +511,13 @@ class _ChatbotPageState extends State<ChatbotPage> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => const DashboardPage(),
+                          ),
+                        );
+                      },
                       child: Icon(
                         Icons.arrow_back,
                         color: primaryBlue,
@@ -688,6 +703,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
             const Text('Belum ada reminder.'),
             const SizedBox(height: 10),
             ElevatedButton.icon(
+              key: const Key('add_reminder_button'),
               onPressed: _isReminderActionLoading ? null : _addReminder,
               icon: const Icon(Icons.add),
               label: const Text('Tambah Reminder'),
